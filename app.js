@@ -119,7 +119,7 @@ const auth = (req, res, next) => {
 //--------------------------------------//
       
 // 2.listen()メソッドを実行して3010番ポートで待ち受け。
-const server = app.listen(3010, function() {
+const server = app.listen(process.env.PORT, function() {
     console.log("Node.js is listening to PORT:" + server.address().port);
 });
 
