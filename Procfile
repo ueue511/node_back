@@ -1,1 +1,1 @@
-web: node app.jp
+web: node app.js
