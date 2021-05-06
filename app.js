@@ -126,7 +126,7 @@ const server = app.listen(port, function() {
 });
 
 //mysqlへの接続の設定
-const con = mysql.createConnection({
+const con = mysql.createPool({
     host: process.env.host,
     user: process.env.user,
     password: process.env.password,
@@ -142,9 +142,10 @@ const con = mysql.createConnection({
 // filename: 画像のpath
 
 //DBに接続
-con.connect(function(err) {
+con.getConnection(function(err, connection) {
     if (err) throw err;
     console.log("Connected");
+    connection.release();
 });
 
 //dbからメニューリストを受け取り、画像以外を送信
