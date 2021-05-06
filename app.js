@@ -125,8 +125,16 @@ const server = app.listen(port, function() {
     console.log("Node.js is listening to PORT:" + server.address().port);
 });
 
-//mysqlへの接続の設定
+//mysqlへの接続の設定 コネクションプール
 const con = mysql.createPool({
+    host: process.env.host,
+    user: process.env.user,
+    password: process.env.password,
+    database: process.env.database
+});
+
+//mysqlへの接続設定 sqlに使用
+const con_sql = mysql.createConnection({
     host: process.env.host,
     user: process.env.user,
     password: process.env.password,
@@ -216,7 +224,7 @@ app.post('/adminsternew', auth, async function (req, res, next) {
     //sqlの命令を入力
     const sql = "INSERT INTO users(categre,order_name,price,full_name,temperature,filename,filepic,look) VALUES(?,1);"
 
-    con.query(sql, [DBRow_worth]), (err, result, fields) => {
+    con_sql.query(sql, [DBRow_worth]), (err, result, fields) => {
         if (err) throw err;
         resolve(result);
     }
@@ -236,14 +244,14 @@ app.post('/adminsteradd', auth, async function(req, res, next) {
         DBAdd_pic["filepic"] = req.files.file.data;
         const sql = "UPDATE users SET ?,? WHERE ?";
         delete jsonObject.id;
-        con.query(sql, [jsonObject, DBAdd_pic, DBAdd_id]), (err, result, fields) => {
+        con_sql.query(sql, [jsonObject, DBAdd_pic, DBAdd_id]), (err, result, fields) => {
             if (err) throw err;
             resolve(result);
         }
     } else {
         const sql = "UPDATE users SET ? WHERE ?";
         delete jsonObject.id;
-        con.query(sql, 
+        con_sql.query(sql, 
             [jsonObject, DBAdd_id]), (err, result, fields) => {
             if (err) throw err;
             resolve(result);
@@ -255,7 +263,7 @@ app.post('/adminsteradd', auth, async function(req, res, next) {
 app.post('/adminsterdelete', auth, (req, res, next) => {
     listid = JSON.parse(req.body.id);
     const sql = "UPDATE users SET look=0 WHERE id=?";
-    con.query(sql, [listid.id]), (err, result, fileld) => {
+    con_sql.query(sql, [listid.id]), (err, result, fileld) => {
         if (err) throw err;
         resolve(result);
     }
