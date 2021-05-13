@@ -36,6 +36,43 @@ app.use(fileUpload());
 // adm-zipをインポート
 const zip = new AdmZip()
 
+// 2.listen()メソッドを実行して3010番ポートで待ち受け。
+var port = process.env.PORT || 3306
+
+const server = app.listen(port, function() {
+    console.log("Node.js is listening to PORT:" + server.address().port);
+});
+
+//mysqlへの接続の設定 コネクションプール
+const con = mysql.createPool({
+    host: process.env.host,
+    user: process.env.user,
+    password: process.env.password,
+    database: process.env.database
+});
+
+//mysqlへの接続設定 sqlに使用
+const con_sql = mysql.createConnection({
+    host: process.env.host,
+    user: process.env.user,
+    password: process.env.password,
+    database: process.env.database
+});
+
+//テーブル users の作成
+// categre: setmeal.食事 drink.飲み物 dessert.デザート
+// order_name: 略語
+// price: 値段
+// full_name: 正式名所
+// temperature: hot or ice
+// filename: 画像のpath
+
+//DBに接続
+con.getConnection(function(err, connection) {
+    if (err) throw err;
+    console.log("Connected");
+    connection.release();
+});
 
 //------------------関数設定------------------//
 
@@ -118,43 +155,7 @@ const auth = (req, res, next) => {
 
 //--------------------------------------//
       
-// 2.listen()メソッドを実行して3010番ポートで待ち受け。
-var port = process.env.PORT || 3306
 
-const server = app.listen(port, function() {
-    console.log("Node.js is listening to PORT:" + server.address().port);
-});
-
-//mysqlへの接続の設定 コネクションプール
-const con = mysql.createPool({
-    host: process.env.host,
-    user: process.env.user,
-    password: process.env.password,
-    database: process.env.database
-});
-
-//mysqlへの接続設定 sqlに使用
-const con_sql = mysql.createConnection({
-    host: process.env.host,
-    user: process.env.user,
-    password: process.env.password,
-    database: process.env.database
-});
-
-//テーブル users の作成
-// categre: setmeal.食事 drink.飲み物 dessert.デザート
-// order_name: 略語
-// price: 値段
-// full_name: 正式名所
-// temperature: hot or ice
-// filename: 画像のpath
-
-//DBに接続
-con.getConnection(function(err, connection) {
-    if (err) throw err;
-    console.log("Connected");
-    connection.release();
-});
 
 //dbからメニューリストを受け取り、画像以外を送信
 app.get('/menulist', async function(req, res, next) {
